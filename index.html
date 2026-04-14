@@ -1827,44 +1827,29 @@ function resetAll(){
     showToast('Catalogue vidé','var(--red)');
 }
 
-// ════════════ INIT ════════════
+// ════════════ INIT DE SECOURS ════════════
 function initSite() {
+    // Force le chargement de la mémoire
+    var saved = localStorage.getItem('rbx_builds_catalog');
+    products = saved ? JSON.parse(saved) : [];
+
+    // Relance tout dans l'ordre
     try {
-        // 1. Charger les bâtiments depuis la mémoire
-        let savedData = localStorage.getItem('rbx_builds_catalog');
+        if(window.checkBan) checkBan();
+        if(window.updateFavCount) updateFavCount();
+        if(window.renderFilter) renderFilter();
+        if(window.renderProducts) renderProducts();
+        if(window.renderPacks) renderPacks();
+        if(window.refreshEventBanner) refreshEventBanner();
         
-        // Si vide, on s'assure que products est un tableau vide au moins
-        if (!savedData) {
-            products = [];
-            console.log("💾 Mémoire vide, démarrage à blanc.");
-        } else {
-            // Si on trouve quelque chose, on l'utilise
-            products = JSON.parse(savedData);
-            console.log("📦 " + products.length + " bâtiments chargés !");
-        }
-
-        // 2. Lancer les fonctions standards SI elles existent
-        // Pour éviter de bloquer sur une fonction manquante
-        if(typeof checkBan === 'function') checkBan();
-        if(typeof updateFavCount === 'function') updateFavCount();
-        if(typeof renderFilter === 'function') renderFilter();
+        // C'EST CETTE LIGNE QUI FAIT REVENIR LE CURSEUR ET LES ANIMATIONS
+        if(window.observeAll) observeAll(); 
         
-        // LA FONCTION LA PLUS IMPORTANTE : AFFICHER !
-        if(typeof renderProducts === 'function') renderProducts();
-        
-        if(typeof renderPacks === 'function') renderPacks();
-        if(typeof refreshEventBanner === 'function') refreshEventBanner();
-        if(typeof observeAll === 'function') observeAll();
-
-        console.log("🚀 RBX Studio Shop Prêt !");
-        
-    } catch (e) {
-        // En cas d'erreur fatale, on log et on force l'affichage de vide
-        console.error("❌ Erreur critique au lancement :", e);
-        products = [];
-        if(typeof renderProducts === 'function') renderProducts();
+        console.log("✅ Système réparé");
+    } catch(err) {
+        console.error("Erreur relance:", err);
     }
 }
 
-// Lancement automatique du script de démarrage
-window.addEventListener('DOMContentLoaded', initSite);
+// On lance direct
+initSite();

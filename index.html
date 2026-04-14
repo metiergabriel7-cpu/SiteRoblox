@@ -736,8 +736,9 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:36
 </footer>
 
 <script>
-// ════════════ STATE ════════════
-var PRODUCTS = JSON.parse(localStorage.getItem('rbxs_products')||'null') || [
+// ════════════ STATE (SAUVEGARDE AUTO) ════════════
+// On récupère les données enregistrées, sinon on commence avec une liste vide []
+var products = JSON.parse(localStorage.getItem('rbx_builds_catalog')) || [];
   {id:1,cat:'batiment',title:'Centre Commercial Premium',
    descShort:'Mall 2 étages avec boutiques, food court et parkings intégrés.',
    descLong:'Ce centre commercial ultra-détaillé comprend 2 niveaux intégralement modélisés avec escalators, ascenseurs, food court central et 12 boutiques indépendantes configurables. Parfait pour les jeux de type ville roleplay ou simulation commerciale.',
@@ -1740,61 +1741,97 @@ function deleteProblem(i){PROBLEMS.splice(i,1);renderAdminProblems();}
 // ════════════ ADMIN — SETTINGS ════════════
 function renderAdminSettings(){
   document.getElementById('admin-body').innerHTML=
-    '<div class="settings-section">'
+    '<div class="settings-section" style="border: 1px solid var(--studio); background: rgba(0, 180, 216, 0.05);">'
+      +'<div class="settings-title" style="color:var(--studio)">🏗️ Ajouter un Nouveau Bâtiment</div>'
+      +'<div class="form-grid">'
+        +'<div class="form-group"><div class="form-label">Nom du build</div><input class="form-input" id="new-name" placeholder="Ex: Pharmacie Moderne"/></div>'
+        +'<div class="form-group"><div class="form-label">Prix (Robux)</div><input class="form-input" type="number" id="new-price" placeholder="500"/></div>'
+        +'<div class="form-group" style="grid-column: span 2"><div class="form-label">Lien de l\'image (URL)</div><input class="form-input" id="new-img" placeholder="https://imgur.com/votre-image.png"/></div>'
+      +'</div>'
+      +'<div class="form-actions" style="margin-top:14px"><button class="btn-save" style="background:var(--studio); width:100%" onclick="quickAddBuild()">🚀 Publier sur le site</button></div>'
+    +'</div>'
+
+    +'<div class="settings-section">'
       +'<div class="settings-title">🔐 Sécurité admin</div>'
       +'<div class="form-grid">'
         +'<div class="form-group"><div class="form-label">Nouveau mot de passe</div><input class="form-input" type="password" id="set-pwd"/></div>'
-        +'<div class="form-group"><div class="form-label">Confirmer mot de passe</div><input class="form-input" type="password" id="set-pwd2"/></div>'
-        +'<div class="form-group"><div class="form-label">Nouveau PIN (4 chiffres)</div><input class="form-input" type="password" id="set-pin" maxlength="4"/></div>'
-        +'<div class="form-group"><div class="form-label">Confirmer PIN</div><input class="form-input" type="password" id="set-pin2" maxlength="4"/></div>'
+        +'<div class="form-group"><div class="form-label">Nouveau PIN</div><input class="form-input" type="password" id="set-pin" maxlength="4"/></div>'
       +'</div>'
       +'<div class="form-actions" style="margin-top:14px"><button class="btn-save" onclick="saveSecuritySettings()">Mettre à jour</button></div>'
     +'</div>'
+
     +'<div class="settings-section">'
-      +'<div class="settings-title">🏪 Boutique</div>'
-      +'<div class="form-group"><div class="form-label">Texte bannière haut</div><input class="form-input" id="set-topbar" value="'+document.getElementById('topbar-el').innerText.trim()+'"/></div>'
-      +'<div class="form-actions" style="margin-top:10px"><button class="btn-save" onclick="saveTopbar()">Appliquer</button></div>'
-    +'</div>'
-    +'<div class="settings-section">'
-      +'<div class="settings-title">ℹ Infos</div>'
+      +'<div class="settings-title">ℹ Infos Catalogue</div>'
       +'<div style="font-size:12px;color:var(--text2);line-height:2.4">'
-        +'<div>📦 <b style="color:var(--text)">'+PRODUCTS.length+'</b> produits · ⭐ <b style="color:var(--gold)">'+FAVORITES.length+'</b> favoris</div>'
-        +'<div>🚩 <b style="color:var(--red)">'+REPORTS.filter(function(r){return !r.resolved;}).length+'</b> signalements ouverts</div>'
-        +'<div>🚫 <b style="color:var(--orange)">'+BANS.filter(function(b){return b.active;}).length+'</b> bans actifs</div>'
-        +'<div>⭐ <b style="color:var(--gold)">'+Object.values(REVIEWS).reduce(function(a,b){return a+b.length;},0)+'</b> avis publiés</div>'
-        +'<div>📷 Multi-images activé · 📝 Textes multiples activés</div>'
+        +'<div>📦 <b style="color:var(--text)">'+products.length+'</b> produits en ligne</div>'
+        +'<div>💾 <b style="color:var(--green)">Sauvegarde LocalStorage Activée</b></div>'
       +'</div>'
     +'</div>'
+
     +'<div class="settings-section">'
-      +'<div class="settings-title">🛠 Debug</div>'
+      +'<div class="settings-title">🛠 Debug & Maintenance</div>'
       +'<div style="display:flex;gap:9px;flex-wrap:wrap;">'
-        +'<button class="apr-btn apr-btn-edit" onclick="resetPurchases()">Effacer pass achetés</button>'
-        +'<button class="apr-btn apr-btn-del" onclick="resetAll()">⚠ Reset complet</button>'
+        +'<button class="apr-btn apr-btn-del" onclick="resetAll()">⚠ Tout effacer (Reset)</button>'
       +'</div>'
     +'</div>';
 }
-function saveSecuritySettings(){
-  var pwd=document.getElementById('set-pwd').value,pwd2=document.getElementById('set-pwd2').value;
-  var pin=document.getElementById('set-pin').value,pin2=document.getElementById('set-pin2').value;
-  if(pwd&&pwd!==pwd2){showToast('Mots de passe différents','var(--red)');return;}
-  if(pin&&pin!==pin2){showToast('PINs différents','var(--red)');return;}
-  if(pin&&!/^\d{4}$/.test(pin)){showToast('PIN = 4 chiffres','var(--red)');return;}
-  if(pwd){ADMIN_PASSWORD=pwd;localStorage.setItem('rbxs_admin_pwd',pwd);}
-  if(pin){ADMIN_PIN=pin;localStorage.setItem('rbxs_admin_pin',pin);}
-  showToast('Sécurité mise à jour !','var(--green)');
+
+// --- FONCTION MAGIQUE D'AJOUT ---
+function quickAddBuild() {
+    var name = document.getElementById('new-name').value;
+    var price = document.getElementById('new-price').value;
+    var img = document.getElementById('new-img').value;
+
+    if(!name || !price || !img) {
+        showToast('Remplis tous les champs !', 'var(--red)');
+        return;
+    }
+
+    // Ajout à la liste
+    products.push({
+        id: Date.now(),
+        name: name,
+        price: price,
+        imgs: [img],
+        desc: "Bâtiment Premium RBX Builds",
+        stars: 5,
+        specs: { part: "High Poly", script: "Optimisé" }
+    });
+
+    // Sauvegarde et Rafraîchissement
+    localStorage.setItem('rbx_builds_catalog', JSON.stringify(products));
+    renderProducts(); 
+    renderAdminSettings(); // Pour mettre à jour le compteur
+    showToast('Bâtiment ajouté et sauvegardé !', 'var(--green)');
+    
+    // Nettoyage des champs
+    document.getElementById('new-name').value = "";
+    document.getElementById('new-price').value = "";
+    document.getElementById('new-img').value = "";
 }
-function saveTopbar(){var tb=document.getElementById('set-topbar').value;if(tb)document.getElementById('topbar-el').textContent=tb;showToast('Bannière mise à jour !','var(--green)');}
-function resetPurchases(){purchasedPasses=[];localStorage.removeItem('rbxs_purchased');showToast('Pass effacés','var(--orange)');}
-function resetAll(){if(!confirm('Reset complet ?'))return;localStorage.clear();location.reload();}
+
+function saveSecuritySettings(){
+    var pwd=document.getElementById('set-pwd').value;
+    var pin=document.getElementById('set-pin').value;
+    if(pwd){ADMIN_PASSWORD=pwd;localStorage.setItem('rbxs_admin_pwd',pwd);}
+    if(pin){ADMIN_PIN=pin;localStorage.setItem('rbxs_admin_pin',pin);}
+    showToast('Sécurité mise à jour !','var(--green)');
+}
+
+function resetAll(){
+    if(!confirm('Voulez-vous vraiment supprimer TOUS les bâtiments ?')) return;
+    localStorage.removeItem('rbx_builds_catalog');
+    products = [];
+    renderProducts();
+    renderAdminSettings();
+    showToast('Catalogue vidé','var(--red)');
+}
 
 // ════════════ INIT ════════════
 checkBan();
 updateFavCount();
 renderFilter();
-renderProducts();
+renderProducts(); // Affichera les bâtiments sauvés grâce au Bloc 1
 renderPacks();
 refreshEventBanner();
 observeAll();
-</script>
-</body>
-</html>

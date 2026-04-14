@@ -737,8 +737,9 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:36
 
 <script>
 // ════════════ STATE (SAUVEGARDE AUTO) ════════════
-// On récupère les données enregistrées, sinon on commence avec une liste vide []
-var products = JSON.parse(localStorage.getItem('rbx_builds_catalog')) || [];
+// On crée les deux noms (minuscule et majuscule) pour être sûr
+var products = JSON.parse(localStorage.getItem('rbx_save_data')) || [];
+var PRODUCTS = products;
   {id:1,cat:'batiment',title:'Centre Commercial Premium',
    descShort:'Mall 2 étages avec boutiques, food court et parkings intégrés.',
    descLong:'Ce centre commercial ultra-détaillé comprend 2 niveaux intégralement modélisés avec escalators, ascenseurs, food court central et 12 boutiques indépendantes configurables. Parfait pour les jeux de type ville roleplay ou simulation commerciale.',
@@ -1827,29 +1828,35 @@ function resetAll(){
     showToast('Catalogue vidé','var(--red)');
 }
 
-// ════════════ INIT DE SECOURS ════════════
-function initSite() {
-    // Force le chargement de la mémoire
-    var saved = localStorage.getItem('rbx_builds_catalog');
-    products = saved ? JSON.parse(saved) : [];
+// ════════════ INIT SÉCURISÉ ════════════
+function init() {
+    console.log("Démarrage du système...");
+    
+    // On s'assure que PRODUCTS n'est pas indéfini
+    if (typeof products === 'undefined') products = [];
+    if (typeof PRODUCTS === 'undefined') PRODUCTS = products;
 
-    // Relance tout dans l'ordre
     try {
-        if(window.checkBan) checkBan();
-        if(window.updateFavCount) updateFavCount();
-        if(window.renderFilter) renderFilter();
-        if(window.renderProducts) renderProducts();
-        if(window.renderPacks) renderPacks();
-        if(window.refreshEventBanner) refreshEventBanner();
+        checkBan();
+        updateFavCount();
+        renderFilter();
         
-        // C'EST CETTE LIGNE QUI FAIT REVENIR LE CURSEUR ET LES ANIMATIONS
-        if(window.observeAll) observeAll(); 
+        // On force l'affichage même si c'est vide
+        renderProducts(); 
         
-        console.log("✅ Système réparé");
-    } catch(err) {
-        console.error("Erreur relance:", err);
+        renderPacks();
+        refreshEventBanner();
+        
+        // RELANCE LE CURSEUR ET LES ANIMATIONS
+        if (typeof observeAll === 'function') {
+            observeAll();
+        }
+
+        console.log("✅ Site opérationnel !");
+    } catch (e) {
+        console.error("Erreur bloquée pour éviter le crash :", e);
     }
 }
 
-// On lance direct
-initSite();
+// On lance
+init();

@@ -737,102 +737,56 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:36
 
 <script>
 // ════════════ STATE (SAUVEGARDE AUTO) ════════════
-// On crée les deux noms (minuscule et majuscule) pour être sûr
-var products = JSON.parse(localStorage.getItem('rbx_save_data')) || [];
-var PRODUCTS = products;
+
+// 1. On charge la mémoire. Si c'est vide, on utilise la liste par défaut ci-dessous
+var savedProducts = JSON.parse(localStorage.getItem('rbx_save_data'));
+
+var products = savedProducts || [
   {id:1,cat:'batiment',title:'Centre Commercial Premium',
    descShort:'Mall 2 étages avec boutiques, food court et parkings intégrés.',
-   descLong:'Ce centre commercial ultra-détaillé comprend 2 niveaux intégralement modélisés avec escalators, ascenseurs, food court central et 12 boutiques indépendantes configurables. Parfait pour les jeux de type ville roleplay ou simulation commerciale.',
-   descTech:'Compatible R15 · Anchored · CanCollide activé · LOD optimisé · Pas de scripts inclus',
-   descIncluded:'Fichier .rbxm prêt à importer\nTextues HD intégrées\n12 boutiques vides configurables\nParking extérieur 40 places\nFood court avec tables',
+   descLong:'Ce centre commercial ultra-détaillé comprend 2 niveaux intégralement modélisés avec escalators, ascenseurs, food court central et 12 boutiques indépendantes configurables.',
+   descTech:'Compatible R15 · Anchored · LOD optimisé',
+   descIncluded:'Fichier .rbxm prêt à importer\nTextues HD intégrées',
    specs:['2 étages','12 boutiques','Parking'],price:800,old:1200,badge:'hot',
-   images:[],emoji:'🏬',
+   images:['https://picsum.photos/400/300'],emoji:'🏬',
    linkPass:'https://discord.gg/votre-lien',linkPlugin:'https://discord.gg/votre-lien'},
+
   {id:2,cat:'batiment',title:'Station-Service Ultra',
    descShort:'Station complète avec pompes, mini-market et zone de lavage.',
-   descLong:'Station-service réaliste avec 4 pompes à carburant animées, un mini-market intérieur complet avec rayons et caisse, et une zone de lavage automatique. Idéal pour les jeux de simulation de vie ou de voitures.',
-   descTech:'Compatible R15 · Anchored · Pompes animées par script optionnel · Optimisé mobile',
-   descIncluded:'Fichier .rbxm complet\n4 pompes (design réaliste)\nMini-market intérieur\nCar wash animé\nEnseignes lumineuses',
+   descLong:'Station-service réaliste avec 4 pompes à carburant animées, un mini-market intérieur complet.',
+   descTech:'Compatible R15 · Anchored · Pompes animées',
+   descIncluded:'Fichier .rbxm complet\n4 pompes',
    specs:['4 pompes','Mini-market','Car wash'],price:500,old:null,badge:'new',
-   images:[],emoji:'⛽',
+   images:['https://picsum.photos/401/300'],emoji:'⛽',
    linkPass:'https://discord.gg/votre-lien',linkPlugin:'https://discord.gg/votre-lien'},
+
   {id:3,cat:'batiment',title:'Fast-Food Drive',
    descShort:'Restaurant fast-food avec drive-through et enseigne animée.',
-   descLong:'Fast-food moderne style burger avec drive-through intégré, terrasse extérieure, intérieur avec tables et comptoir détaillé. Enseigne néon animée incluse.',
-   descTech:'Compatible R15 · Anchored · Néon script inclus · ~850 parts',
-   descIncluded:'Fichier .rbxm\nIntérieur + extérieur\nDrive-through complet\nEnseignes néon\nTerrasse',
+   descLong:'Fast-food moderne style burger avec drive-through intégré, terrasse extérieure.',
+   descTech:'Compatible R15 · Anchored · Néon script inclus',
+   descIncluded:'Fichier .rbxm\nIntérieur + extérieur',
    specs:['Drive-through','Terrasse','Néon'],price:400,old:null,badge:null,
-   images:[],emoji:'🍔',
-   linkPass:'https://discord.gg/votre-lien',linkPlugin:'https://discord.gg/votre-lien'},
-  {id:4,cat:'batiment',title:'Entrepôt Industriel',
-   descShort:'Grand entrepôt avec quai de chargement et parking PL.',
-   descLong:'Entrepôt industriel grande échelle avec quai de chargement surélevé, zone de stationnement pour poids lourds, portail sécurisé et intérieur vide modulable. Idéal pour les jeux de livraison ou de crime.',
-   descTech:'Compatible R15 · Anchored · Intérieur vide · ~1200 parts',
-   descIncluded:'Fichier .rbxm\nQuai de chargement\nParking PL 8 places\nPortail coulissant\nClôture périmétrique',
-   specs:['Quai chargement','Parking PL','Sécurité'],price:550,old:750,badge:'sale',
-   images:[],emoji:'🏭',
-   linkPass:'https://discord.gg/votre-lien',linkPlugin:'https://discord.gg/votre-lien'},
-  {id:5,cat:'batiment',title:'Boutique Moderne',
-   descShort:'Petite boutique tendance avec vitrine illuminée.',
-   descLong:'Boutique tendance avec grande vitrine illuminée, intérieur avec présentoirs, comptoir et cabine d\'essayage. Style contemporain, parfaite pour garnir une rue commerçante.',
-   descTech:'Compatible R15 · Anchored · ~400 parts · Vitrine avec émissive lighting',
-   descIncluded:'Fichier .rbxm\nVitrine illuminée\nIntérieur avec présentoirs\nComptoir caisse\nCabine d\'essayage',
-   specs:['Vitrine illuminée','2 pièces','Optimisé'],price:300,old:null,badge:null,
-   images:[],emoji:'🏪',
-   linkPass:'https://discord.gg/votre-lien',linkPlugin:'https://discord.gg/votre-lien'},
-  {id:6,cat:'batiment',title:'Restaurant Gastronomique',
-   descShort:'Établissement haut de gamme avec terrasse et cuisine ouverte.',
-   descLong:'Restaurant haut de gamme avec salle principale, cuisine ouverte visible, bar, terrasse en bois avec pergola et éclairage d\'ambiance. Parfait pour les jeux RP de luxe ou simulation de restauration.',
-   descTech:'Compatible R15 · Anchored · ~1100 parts · Éclairage ambiance inclus',
-   descIncluded:'Fichier .rbxm\nSalle + terrasse\nCuisine ouverte\nBar complet\nÉclairage ambiance\nPergola bois',
-   specs:['Terrasse','Cuisine ouverte','Luxueux'],price:600,old:850,badge:'exclusive',
-   images:[],emoji:'🍽️',
-   linkPass:'https://discord.gg/votre-lien',linkPlugin:'https://discord.gg/votre-lien'},
-  {id:7,cat:'batiment',title:'Immeuble de Bureaux Vitré',
-   descShort:'Tour vitrée avec hall luxueux et toit-terrasse.',
-   descLong:'Tour de bureaux moderne entièrement vitrée, avec hall d\'accueil luxueux au rez-de-chaussée, étages ouverts modulables, ascenseurs et toit-terrasse panoramique. Idéal pour les jeux d\'entreprise ou de ville.',
-   descTech:'Compatible R15 · Anchored · ~2000 parts · 6 étages · Ascenseurs décoratifs',
-   descIncluded:'Fichier .rbxm\n6 étages modulables\nHall luxueux\nToit-terrasse\nAscenseurs (déco)\nFaçade vitrée complète',
-   specs:['Tour vitrée','Toit-terrasse','Hall luxueux'],price:900,old:1300,badge:'hot',
-   images:[],emoji:'🏙️',
-   linkPass:'https://discord.gg/votre-lien',linkPlugin:'https://discord.gg/votre-lien'},
-  {id:8,cat:'batiment',title:'Garage Mécanique',
-   descShort:'Garage avec 4 ponts élévateurs et façade brick réaliste.',
-   descLong:'Garage mécanique professionnel avec 4 ponts élévateurs, zone d\'attente clients, bureau, outils décoratifs et façade en brique peinte réaliste. Parfait pour les jeux de voiture ou de vie.',
-   descTech:'Compatible R15 · Anchored · Ponts statiques · ~700 parts',
-   descIncluded:'Fichier .rbxm\n4 ponts élévateurs\nZone attente\nBureau\nFaçade brick\nOutils décoratifs',
-   specs:['4 ponts','Zone attente','Façade brick'],price:450,old:null,badge:'new',
-   images:[],emoji:'🔧',
-   linkPass:'https://discord.gg/votre-lien',linkPlugin:'https://discord.gg/votre-lien'},
-  {id:9,cat:'batiment',title:'Supermarché',
-   descShort:'Grand supermarché avec parking et rayons intérieurs.',
-   descLong:'Grand supermarché avec 6 rayons thématiques (fruits, frais, surgelés, boissons, hygiène, caisse), parking extérieur 30 places avec marquage au sol et façade moderne avec enseigne lumineuse.',
-   descTech:'Compatible R15 · Anchored · ~1600 parts · Caisses déco · Enseigne émissive',
-   descIncluded:'Fichier .rbxm\nParking 30 places\n6 rayons thématiques\nCaisses enregistreuses\nEnseignes lumineuses\nLocal technique',
-   specs:['Parking 30 places','Rayons','Caissiers'],price:750,old:1000,badge:null,
-   images:[],emoji:'🛒',
-   linkPass:'https://discord.gg/votre-lien',linkPlugin:'https://discord.gg/votre-lien'},
-  {id:10,cat:'batiment',title:'Parking Multi-Niveaux',
-   descShort:'Parking aérien 3 étages avec rampes et 80 places.',
-   descLong:'Structure de parking aérien sur 3 niveaux avec rampes d\'accès, marquage au sol, éclairage intérieur, barrières automatiques décoratives et 80 places numérotées. Compatible avec tous les types de véhicules Roblox.',
-   descTech:'Compatible R15 · Anchored · ~1800 parts · 3 niveaux · Rampes praticables',
-   descIncluded:'Fichier .rbxm\n3 niveaux\n80 places numérotées\nRampes praticables\nÉclairage intérieur\nBarrières décoratives',
-   specs:['3 niveaux','Rampes','80 places'],price:550,old:null,badge:'new',
-   images:[],emoji:'🅿️',
-   linkPass:'https://discord.gg/votre-lien',linkPlugin:'https://discord.gg/votre-lien'},
+   images:['https://picsum.photos/402/300'],emoji:'🍔',
+   linkPass:'https://discord.gg/votre-lien',linkPlugin:'https://discord.gg/votre-lien'}
 ];
-var PACKS = JSON.parse(localStorage.getItem('rbxs_packs')||'null') || [
-  {id:'starter',tier:'starter',title:'City Starter',sub:'Parfait pour commencer une ville',items:['Centre Commercial Standard','Station-Service Classique','Fast-Food Drive','Support Discord'],price:1800,old:2400,savings:'25',link:'https://discord.gg/votre-lien'},
-  {id:'pro',tier:'pro',title:'Urban Pro',sub:'La ville complète avec bâtiments premium',items:['Tout le Pack Starter','Centre Commercial Luxe','Restaurant Gastronomique','Immeuble de Bureaux','Parking Multi-niveaux','Accès mises à jour'],price:3200,old:5000,savings:'35',featured:true,link:'https://discord.gg/votre-lien'},
-  {id:'ultimate',tier:'ultimate',title:'City Builder Ultimate',sub:'TOUS les bâtiments et exclusifs',items:['TOUS les bâtiments','3 bâtiments exclusifs','Support VIP 1h','Mises à jour à vie','Accès beta'],price:5500,old:9000,savings:'40',link:'https://discord.gg/votre-lien'},
+
+// On synchronise PRODUCTS (majuscule) pour le reste du code
+var PRODUCTS = products;
+
+// ════════════ AUTRES DONNÉES ════════════
+var PACKS = JSON.parse(localStorage.getItem('rbxs_packs')) || [
+  {id:'starter',tier:'starter',title:'City Starter',sub:'Parfait pour commencer une ville',items:['Centre Commercial Standard','Station-Service Classique'],price:1800,old:2400,savings:'25',link:'https://discord.gg/votre-lien'},
+  {id:'pro',tier:'pro',title:'Urban Pro',sub:'La ville complète',items:['Tout le Pack Starter','Centre Commercial Luxe'],price:3200,old:5000,savings:'35',featured:true,link:'https://discord.gg/votre-lien'},
+  {id:'ultimate',tier:'ultimate',title:'City Builder Ultimate',sub:'TOUS les bâtiments',items:['TOUS les bâtiments','Exclusifs'],price:5500,old:9000,savings:'40',link:'https://discord.gg/votre-lien'}
 ];
-var EVENTS = JSON.parse(localStorage.getItem('rbxs_events')||'null') || [];
-var REPORTS = JSON.parse(localStorage.getItem('rbxs_reports')||'null') || [];
-var REVIEWS = JSON.parse(localStorage.getItem('rbxs_reviews')||'null') || {};
-var BANS = JSON.parse(localStorage.getItem('rbxs_bans')||'null') || [];
-var PROBLEMS = JSON.parse(localStorage.getItem('rbxs_problems')||'null') || [];
-var FAVORITES = JSON.parse(localStorage.getItem('rbxs_favorites')||'[]');
-var purchasedPasses = JSON.parse(localStorage.getItem('rbxs_purchased')||'[]');
+
+var EVENTS = JSON.parse(localStorage.getItem('rbxs_events')) || [];
+var REPORTS = JSON.parse(localStorage.getItem('rbxs_reports')) || [];
+var REVIEWS = JSON.parse(localStorage.getItem('rbxs_reviews')) || {};
+var BANS = JSON.parse(localStorage.getItem('rbxs_bans')) || [];
+var PROBLEMS = JSON.parse(localStorage.getItem('rbxs_problems')) || [];
+var FAVORITES = JSON.parse(localStorage.getItem('rbxs_favorites')) || [];
+var purchasedPasses = JSON.parse(localStorage.getItem('rbxs_purchased')) || [];
 
 var ADMIN_PASSWORD = localStorage.getItem('rbxs_admin_pwd') || 'admin123';
 var ADMIN_PIN = localStorage.getItem('rbxs_admin_pin') || '1234';

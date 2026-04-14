@@ -1828,10 +1828,29 @@ function resetAll(){
 }
 
 // ════════════ INIT ════════════
-checkBan();
-updateFavCount();
-renderFilter();
-renderProducts(); // Affichera les bâtiments sauvés grâce au Bloc 1
-renderPacks();
-refreshEventBanner();
-observeAll();
+function init() {
+    // 1. On essaie de charger les données du navigateur
+    const savedData = localStorage.getItem('rbx_builds_catalog');
+    
+    if (savedData) {
+        // Si on trouve une sauvegarde, on l'utilise
+        products = JSON.parse(savedData);
+    } else {
+        // Si c'est vide, on met une liste vide pour éviter le bug du cube orange
+        products = [];
+    }
+
+    // 2. On lance les fonctions d'affichage
+    checkBan();
+    updateFavCount();
+    renderFilter();
+    renderProducts(); // Maintenant il a soit tes builds, soit du vide propre
+    renderPacks();
+    refreshEventBanner();
+    observeAll();
+    
+    console.log("🚀 Site prêt !");
+}
+
+// On appelle la fonction init
+init();

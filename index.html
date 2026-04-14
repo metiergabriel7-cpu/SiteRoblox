@@ -1787,14 +1787,46 @@ function saveTopbar(){var tb=document.getElementById('set-topbar').value;if(tb)d
 function resetPurchases(){purchasedPasses=[];localStorage.removeItem('rbxs_purchased');showToast('Pass effacés','var(--orange)');}
 function resetAll(){if(!confirm('Reset complet ?'))return;localStorage.clear();location.reload();}
 
-// ════════════ INIT ════════════
+// ════════════ INIT AVEC SAUVEGARDE ════════════
+
+// 1. Les fonctions de mémoire (LocalStorage)
+function saveToSite() {
+    localStorage.setItem('rbx_builds_catalog', JSON.stringify(products));
+}
+
+function loadFromSite() {
+    const savedData = localStorage.getItem('rbx_builds_catalog');
+    if (savedData) {
+        products = JSON.parse(savedData);
+    }
+    renderProducts(); // Affiche ce qui est en mémoire
+}
+
+// 2. La fonction pour ajouter un bâtiment (ex: dans la console F12)
+function addBuild(nom, prix, imageURL) {
+    products.push({
+        id: Date.now(),
+        name: nom,
+        price: prix,
+        imgs: [imageURL],
+        desc: "Bâtiment ajouté via RBX Builds.",
+        stars: 5,
+        specs: { part: "Pro", script: "Sécurisé" }
+    });
+    saveToSite();
+    renderProducts();
+    console.log("✅ Bâtiment ajouté !");
+}
+
+// 3. Lancement des fonctions
 checkBan();
 updateFavCount();
 renderFilter();
-renderProducts();
+loadFromSite(); // REMPLACE renderProducts pour charger la mémoire
 renderPacks();
 refreshEventBanner();
 observeAll();
+
 </script>
 </body>
 </html>

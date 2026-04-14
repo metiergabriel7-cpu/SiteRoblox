@@ -1828,29 +1828,43 @@ function resetAll(){
 }
 
 // ════════════ INIT ════════════
-function init() {
-    // 1. On essaie de charger les données du navigateur
-    const savedData = localStorage.getItem('rbx_builds_catalog');
-    
-    if (savedData) {
-        // Si on trouve une sauvegarde, on l'utilise
-        products = JSON.parse(savedData);
-    } else {
-        // Si c'est vide, on met une liste vide pour éviter le bug du cube orange
-        products = [];
-    }
+function initSite() {
+    try {
+        // 1. Charger les bâtiments depuis la mémoire
+        let savedData = localStorage.getItem('rbx_builds_catalog');
+        
+        // Si vide, on s'assure que products est un tableau vide au moins
+        if (!savedData) {
+            products = [];
+            console.log("💾 Mémoire vide, démarrage à blanc.");
+        } else {
+            // Si on trouve quelque chose, on l'utilise
+            products = JSON.parse(savedData);
+            console.log("📦 " + products.length + " bâtiments chargés !");
+        }
 
-    // 2. On lance les fonctions d'affichage
-    checkBan();
-    updateFavCount();
-    renderFilter();
-    renderProducts(); // Maintenant il a soit tes builds, soit du vide propre
-    renderPacks();
-    refreshEventBanner();
-    observeAll();
-    
-    console.log("🚀 Site prêt !");
+        // 2. Lancer les fonctions standards SI elles existent
+        // Pour éviter de bloquer sur une fonction manquante
+        if(typeof checkBan === 'function') checkBan();
+        if(typeof updateFavCount === 'function') updateFavCount();
+        if(typeof renderFilter === 'function') renderFilter();
+        
+        // LA FONCTION LA PLUS IMPORTANTE : AFFICHER !
+        if(typeof renderProducts === 'function') renderProducts();
+        
+        if(typeof renderPacks === 'function') renderPacks();
+        if(typeof refreshEventBanner === 'function') refreshEventBanner();
+        if(typeof observeAll === 'function') observeAll();
+
+        console.log("🚀 RBX Studio Shop Prêt !");
+        
+    } catch (e) {
+        // En cas d'erreur fatale, on log et on force l'affichage de vide
+        console.error("❌ Erreur critique au lancement :", e);
+        products = [];
+        if(typeof renderProducts === 'function') renderProducts();
+    }
 }
 
-// On appelle la fonction init
-init();
+// Lancement automatique du script de démarrage
+window.addEventListener('DOMContentLoaded', initSite);
